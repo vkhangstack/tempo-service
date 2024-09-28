@@ -163,10 +163,12 @@ export default function Calendar() {
       // eslint-disable-next-line no-plusplus
       for (let i = 0; i < dataLocal.length; i++) {
         if (dataLocal[i].id === id) {
-          dataLocal[i].title = title; // Update title if provided
-          dataLocal[i].extendedProps.description = description; // Update start date if provided
-          dataLocal[i].allDay = allDay; // Update end date if provided
-          dataLocal[i].color = color;
+          dataLocal[i].title = newEvent.title; // Update title if provided
+          dataLocal[i].extendedProps.description = newEvent.extendedProps.description; // Update start date if provided
+          dataLocal[i].allDay = newEvent.allDay; // Update end date if provided
+          dataLocal[i].color = newEvent.color;
+          dataLocal[i].start = newEvent.start;
+          dataLocal[i].end = newEvent.end;
           localStorage.setItem(keyDataEvent, JSON.stringify(dataLocal));
           break;
         }
