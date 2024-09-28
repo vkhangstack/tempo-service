@@ -1,5 +1,6 @@
 import { Alert, Button, Checkbox, Col, Divider, Form, Input, Row } from 'antd';
 import { useState } from 'react';
+import { ThreeDLoader } from 'react-awesome-loaders';
 import { useTranslation } from 'react-i18next';
 import { AiFillGithub, AiFillGoogleCircle, AiFillWechat } from 'react-icons/ai';
 
@@ -16,6 +17,7 @@ function LoginForm() {
   const themeToken = useThemeToken();
   const [loading, setLoading] = useState(false);
   const [autoLogin, setAutoLogin] = useState(true);
+  const [textAutoLogin, setTextAutoLogin] = useState('Automatically connecting to the system...');
 
   const { loginState, setLoginState } = useLoginStateContext();
   const signIn = useSignIn();
@@ -32,15 +34,34 @@ function LoginForm() {
     }
   };
   setTimeout(() => {
+    setTextAutoLogin('Access successful');
+  }, 4200);
+
+  setTimeout(() => {
     handleFinish({ username: DEFAULT_USER.username, password: DEFAULT_USER.password });
-  }, 2000);
+  }, 5000);
 
   if (autoLogin) {
     return (
       <>
         {/* <div className="mb-4 text-2xl font-bold xl:text-3xl">{t('sys.login.signInFormTitle')}</div> */}
-        <div className="mb-4 flex flex-col">
-          <h1>Auto Login...</h1>
+        <div className="mb-4 w-full text-center">
+          <ThreeDLoader
+            colorRing1="#347928"
+            colorRing2="#FCCD2A"
+            desktopSize="100px"
+            className="w-full"
+            mobileSize="64px"
+          />
+          {/* <ScatterBoxLoader
+            primaryColor="#6366F1"
+            background="#FFFFFF"
+            desktopSize="50px"
+            className="w-full"
+            mobileSize="64px"
+            size="32px"
+          /> */}
+          <span className="break-words text-2xl font-thin">{textAutoLogin}</span>
         </div>
       </>
     );

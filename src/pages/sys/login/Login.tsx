@@ -1,9 +1,8 @@
-import { Layout, Typography } from 'antd';
+import { Layout } from 'antd';
 import Color from 'color';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
 
-import DashboardImg from '@/assets/images/background/dashboard.png';
 import Overlay2 from '@/assets/images/background/overlay_2.jpg';
 import LocalePicker from '@/components/locale-picker';
 import { useUserToken } from '@/store/userStore';
@@ -32,7 +31,7 @@ function Login() {
 
   return (
     <Layout className="relative flex !min-h-screen !w-full !flex-row">
-      <div
+      {/* <div
         className="hidden grow flex-col items-center justify-center gap-[80px] bg-center  bg-no-repeat md:flex"
         style={{
           background: bg,
@@ -45,7 +44,7 @@ function Login() {
         <Typography.Text className="flex flex-row gap-[16px] text-2xl">
           {t('sys.login.signInSecondTitle')}
         </Typography.Text>
-      </div>
+      </div> */}
 
       <div className="m-auto flex !h-screen w-full max-w-[480px] flex-col justify-center px-[16px] lg:px-[64px]">
         <LoginStateProvider>
