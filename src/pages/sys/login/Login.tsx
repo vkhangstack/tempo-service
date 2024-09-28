@@ -1,12 +1,8 @@
 import { Layout } from 'antd';
-import Color from 'color';
-import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
 
-import Overlay2 from '@/assets/images/background/overlay_2.jpg';
 import LocalePicker from '@/components/locale-picker';
 import { useUserToken } from '@/store/userStore';
-import { useThemeToken } from '@/theme/hooks';
 
 import LoginForm from './LoginForm';
 import MobileForm from './MobileForm';
@@ -18,16 +14,16 @@ import ResetForm from './ResetForm';
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
 function Login() {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const token = useUserToken();
-  const { colorBgElevated } = useThemeToken();
+  // const { colorBgElevated } = useThemeToken();
 
   if (token.accessToken) {
     return <Navigate to={HOMEPAGE} replace />;
   }
 
-  const gradientBg = Color(colorBgElevated).alpha(0.9).toString();
-  const bg = `linear-gradient(${gradientBg}, ${gradientBg}) center center / cover no-repeat,url(${Overlay2})`;
+  // const gradientBg = Color(colorBgElevated).alpha(0.9).toString();
+  // const bg = `linear-gradient(${gradientBg}, ${gradientBg}) center center / cover no-repeat,url(${Overlay2})`;
 
   return (
     <Layout className="relative flex !min-h-screen !w-full !flex-row">

@@ -9,7 +9,7 @@ import { useRouter } from '@/router/hooks';
 import { useUserInfo, useUserActions } from '@/store/userStore';
 import { useThemeToken } from '@/theme/hooks';
 
-const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
+// const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
 /**
  * Account Dropdown
