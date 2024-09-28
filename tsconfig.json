@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", 
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"], 
+    "useDefineForClassFields": true,
+    "skipLibCheck": true, 
+    "allowJs": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "sourceMap": true, 
+    "declaration": true, // （.d.ts）。
+    "preserveWatchOutput": true,
+    "removeComments": true,
+    "allowImportingTsExtensions": true, 
+    "resolveJsonModule": true, 
+    "isolatedModules": true, 
+    "noEmit": true, 
+    "jsx": "react-jsx",
+    
+    "esModuleInterop": true,
+
+    /* Linting */
+    "strict": true, 
+    "strictNullChecks": true, 
+    "noImplicitAny": true,
+    "noUnusedLocals": true, 
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true, 
+    "useUnknownInCatchVariables": false, 
+
+    // https://vitejs.dev/guide/features#client-types
+    "types": ["vite/client"],
+
+    "baseUrl": ".",
+    /* alias */
+    "paths": {
+      "@/*": ["src/*"],
+      "#/*": ["types/*"]
+    }
+  },
+  "include": ["src", "types"],
+  "exclude": ["node_modules", "dist"]
+}
