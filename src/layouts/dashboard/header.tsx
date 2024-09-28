@@ -2,7 +2,7 @@ import { Drawer } from 'antd';
 import Color from 'color';
 import { CSSProperties, useState } from 'react';
 
-import { IconButton, SvgIcon } from '@/components/icon';
+import { IconButton, Iconify, SvgIcon } from '@/components/icon';
 import LocalePicker from '@/components/locale-picker';
 import Logo from '@/components/logo';
 import { useSettings } from '@/store/settingStore';
@@ -74,6 +74,23 @@ export default function Header({ className = '', offsetTop = false }: Props) {
           <div className="flex">
             <SearchBar />
             <LocalePicker />
+            <div className="group relative">
+              {/* <button> */}
+              <IconButton
+                className="cursor-pointer"
+                onClick={() => window.open('https://phamvankhang.name.vn')}
+              >
+                <Iconify icon="openmoji:authority" size={24} />
+              </IconButton>
+              {/* </button> */}
+              <span
+                onClick={() => window.open('https://phamvankhang.name.vn')}
+                className=" absolute top-8 h-6 w-20 scale-0 cursor-pointer rounded bg-gray-400 p-1 text-xs text-gray-100 group-hover:scale-100"
+              >
+                ✨ Author
+              </span>
+            </div>
+
             {/* <IconButton onClick={() => window.open('https://github.com/d3george/slash-admin')}>
               <Iconify icon="mdi:github" size={24} />
             </IconButton> */}
