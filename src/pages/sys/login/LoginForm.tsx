@@ -1,11 +1,12 @@
 import { Alert, Button, Checkbox, Col, Divider, Form, Input, Row } from 'antd';
+import Lottie from 'lottie-react';
 import { useState } from 'react';
-import { ThreeDLoader } from 'react-awesome-loaders';
 import { useTranslation } from 'react-i18next';
 import { AiFillGithub, AiFillGoogleCircle, AiFillWechat } from 'react-icons/ai';
 
 import { DEFAULT_USER, TEST_USER } from '@/_mock/assets';
 import { SignInReq } from '@/api/services/userService';
+import dataJson from '@/assets/lotties/loading-find-file.json';
 import { useSignIn } from '@/store/userStore';
 import ProTag from '@/theme/antd/components/tag';
 import { useThemeToken } from '@/theme/hooks';
@@ -46,13 +47,13 @@ function LoginForm() {
       <>
         {/* <div className="mb-4 text-2xl font-bold xl:text-3xl">{t('sys.login.signInFormTitle')}</div> */}
         <div className="mb-4 w-full text-center">
-          <ThreeDLoader
+          {/* <ThreeDLoader
             colorRing1="#347928"
             colorRing2="#FCCD2A"
             desktopSize="100px"
             className="w-full"
             mobileSize="64px"
-          />
+          /> */}
           {/* <ScatterBoxLoader
             primaryColor="#6366F1"
             background="#FFFFFF"
@@ -61,6 +62,8 @@ function LoginForm() {
             mobileSize="64px"
             size="32px"
           /> */}
+          <Lottie animationData={dataJson} loop />
+
           <span className="break-words text-2xl font-thin">{textAutoLogin}</span>
         </div>
       </>
