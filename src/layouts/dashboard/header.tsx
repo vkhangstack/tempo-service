@@ -1,15 +1,19 @@
-import { Drawer } from 'antd';
+import { Alert, Button, Drawer, Tooltip } from 'antd';
 import Color from 'color';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useMemo, useState } from 'react';
 
 import { IconButton, Iconify, SvgIcon } from '@/components/icon';
 import LocalePicker from '@/components/locale-picker';
 import Logo from '@/components/logo';
 import { useSettings } from '@/store/settingStore';
 import { useResponsive, useThemeToken } from '@/theme/hooks';
+import { getBytes, getMB } from '@/utils/buffer';
+import { dateToTimestamps, formatDate } from '@/utils/date';
+import { allStorage } from '@/utils/storage';
 
 import AccountDropdown from '../_common/account-dropdown';
 import BreadCrumb from '../_common/bread-crumb';
+import { keyDataEvent } from '../_common/enum';
 import NoticeButton from '../_common/notice';
 import SearchBar from '../_common/search-bar';
 import SettingButton from '../_common/setting-button';
@@ -26,7 +30,8 @@ type Props = {
 export default function Header({ className = '', offsetTop = false }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { themeLayout, breadCrumb } = useSettings();
-  const { colorBgElevated, colorBorder } = useThemeToken();
+  const { colorBgElevated, colorBorder, colorPrimary } = useThemeToken();
+  const [warning, setWarning] = useState(false);
   const { screenMap } = useResponsive();
 
   const headerStyle: CSSProperties = {
@@ -50,6 +55,51 @@ export default function Header({ className = '', offsetTop = false }: Props) {
     headerStyle.width = '100vw';
   }
 
+  const handleRefresh = () => {
+    const dataLocal = localStorage.getItem(keyDataEvent);
+
+    if (!dataLocal) {
+      return;
+    }
+
+    const events: any[] = JSON.parse(dataLocal as string);
+
+    // Sort events by 'start' date in descending order
+    const sortedEvents = events.sort(
+      (a, b) => dateToTimestamps(b.start) - dateToTimestamps(a.start),
+    );
+
+    // Group events by the 'start' date (formatted as yyyy-mm-dd)
+    const groupedByDate = sortedEvents.reduce((acc, event) => {
+      const eventDate = formatDate(event.start);
+      if (!acc[eventDate]) {
+        acc[eventDate] = [];
+      }
+      acc[eventDate].push(event);
+      return acc;
+    }, {});
+
+    // Get the last 3 distinct days
+    const lastThreeDays = Object.keys(groupedByDate).slice(0, 3);
+
+    // Collect all events from the last 3 distinct days
+    const result = lastThreeDays.flatMap((date) => groupedByDate[date]);
+
+    localStorage.setItem(keyDataEvent, JSON.stringify(result));
+
+    window.location.reload();
+  };
+
+  useMemo(() => {
+    const items = allStorage();
+    const bytes = getBytes(items as unknown as string);
+    const mb = getMB(bytes);
+
+    if (mb > 5 - 0.3) {
+      setWarning(true);
+    }
+  }, []);
+
   return (
     <>
       <header className={`z-20 w-full ${className}`} style={headerStyle}>
@@ -72,24 +122,39 @@ export default function Header({ className = '', offsetTop = false }: Props) {
           </div>
 
           <div className="flex">
+            {warning && (
+              <div className="group flex items-center justify-between gap-2 pr-4">
+                <Alert
+                  // description="Note: The application will retain your data for the last 3 days."
+                  message="Storage space has exceeded the limit. Please clean up to continue using."
+                  className="pr-20"
+                />
+                <Tooltip
+                  title="The application will retain your data for the last 3 days."
+                  color={colorPrimary}
+                >
+                  <Button className="h-full" onClick={handleRefresh}>
+                    Refresh{' '}
+                  </Button>
+                </Tooltip>
+              </div>
+            )}
             <SearchBar />
             <LocalePicker />
-            <div className="group relative">
-              {/* <button> */}
-              <IconButton
-                className="cursor-pointer"
-                onClick={() => window.open('https://phamvankhang.name.vn')}
-              >
+            <IconButton
+              className="cursor-pointer"
+              onClick={() => window.open('https://phamvankhang.name.vn')}
+            >
+              <Tooltip title="✨ Author" color={colorPrimary}>
                 <Iconify icon="openmoji:authority" size={24} />
-              </IconButton>
-              {/* </button> */}
-              <span
+              </Tooltip>
+            </IconButton>
+
+            {/* <span
                 onClick={() => window.open('https://phamvankhang.name.vn')}
-                className=" absolute top-8 h-6 w-20 scale-0 cursor-pointer rounded bg-gray-400 p-1 text-xs text-gray-100 group-hover:scale-100"
+                className="absolute top-8 h-6 w-20 scale-0 cursor-pointer rounded bg-gray-400 p-1 text-xs text-gray-100 group-hover:scale-100"
               >
-                ✨ Author
-              </span>
-            </div>
+              </span> */}
 
             {/* <IconButton onClick={() => window.open('https://github.com/d3george/slash-admin')}>
               <Iconify icon="mdi:github" size={24} />

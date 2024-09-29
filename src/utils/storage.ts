@@ -26,3 +26,16 @@ export const removeItem = (key: StorageEnum): void => {
 export const clearItems = () => {
   localStorage.clear();
 };
+
+export const allStorage = () => {
+  const values = [];
+  const keys = Object.keys(localStorage);
+  let i = keys.length;
+
+  // eslint-disable-next-line no-plusplus
+  while (i--) {
+    values.push(localStorage.getItem(keys[i]));
+  }
+
+  return values;
+};

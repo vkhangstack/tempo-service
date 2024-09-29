@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import Card from '@/components/card';
+import { keyDataEvent } from '@/layouts/_common/enum';
 import { useSettings } from '@/store/settingStore';
 import { useResponsive } from '@/theme/hooks';
 
@@ -27,7 +28,6 @@ const DefaultEventInitValue = {
   end: dayjs(),
   color: '',
 };
-const keyDataEvent = 'events';
 export default function Calendar() {
   const fullCalendarRef = useRef<FullCalendar>(null);
   const [view, setView] = useState<ViewType>('dayGridMonth');
@@ -49,11 +49,9 @@ export default function Calendar() {
 
   useMemo(() => {
     const dataLocal = localStorage.getItem(keyDataEvent);
-    if (!dataLocal) {
+    if (!dataLocal || dataLocal === '' || dataLocal === '[]') {
       localStorage.setItem(keyDataEvent, JSON.stringify([]));
-      setDataEvents([]);
     }
-
     setDataEvents(JSON.parse(dataLocal as string));
   }, []);
   /**
@@ -199,13 +197,15 @@ export default function Calendar() {
 
     /** logic set localStorage */
     let dataLocal: any = localStorage.getItem(keyDataEvent);
-    if (!dataLocal) {
-      dataLocal = [];
-    }
+
     dataLocal = JSON.parse(dataLocal as string);
     dataLocal.push(newEvent);
     localStorage.setItem(keyDataEvent, JSON.stringify(dataLocal));
-    setDataEvents(dataLocal);
+
+    setDataEvents((oldEvent) => {
+      const newArr: any = oldEvent?.push(newEvent);
+      return newArr;
+    });
     /** logic set localStorage */
   };
   // delete event
