@@ -2,6 +2,8 @@ import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { Menu, MenuProps } from 'antd';
 import Color from 'color';
 import { m } from 'framer-motion';
+// eslint-disable-next-line import/no-unresolved
+import packageApp from 'package.json';
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 
@@ -29,7 +31,6 @@ export default function Nav(props: Props) {
   const { pathname } = useLocation();
 
   const { colorPrimary, colorTextBase, colorBgElevated, colorBorder } = useThemeToken();
-
   const settings = useSettings();
   const { themeLayout } = settings;
   const { setSettings } = useSettingActions();
@@ -156,6 +157,14 @@ export default function Nav(props: Props) {
           inlineCollapsed={collapsed}
         />
       </Scrollbar>
+      {!collapsed && (
+        <span
+          className="w-64bg-none absolute bottom-0 left-0 p-6 text-left font-serif text-sm"
+          style={{ color: colorPrimary }}
+        >
+          Version: {packageApp.version}
+        </span>
+      )}
     </div>
   );
 }
