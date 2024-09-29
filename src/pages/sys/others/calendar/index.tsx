@@ -173,7 +173,6 @@ export default function Calendar() {
       }
     }
 
-    setDataEvents(dataLocal);
     /** logic set localStorage */
   };
   // create event
@@ -202,10 +201,6 @@ export default function Calendar() {
     dataLocal.push(newEvent);
     localStorage.setItem(keyDataEvent, JSON.stringify(dataLocal));
 
-    setDataEvents((oldEvent) => {
-      const newArr: any = oldEvent?.push(newEvent);
-      return newArr;
-    });
     /** logic set localStorage */
   };
   // delete event
@@ -214,11 +209,13 @@ export default function Calendar() {
     const oldEvent = calendarApi.getEventById(id);
     oldEvent?.remove();
     /** logic set localStorage */
-    setDataEvents((oldEvent) => {
-      const newEvent = oldEvent?.filter((event: EventInput) => event.id !== id);
-      localStorage.setItem(keyDataEvent, JSON.stringify(newEvent));
-      return newEvent;
-    });
+
+    const dataLocal = localStorage.getItem(keyDataEvent);
+    const dataEvents = JSON.parse(dataLocal as string);
+
+    const newEvent = dataEvents?.filter((event: EventInput) => event.id !== id);
+    localStorage.setItem(keyDataEvent, JSON.stringify(newEvent));
+
     /** logic set localStorage */
   };
 
