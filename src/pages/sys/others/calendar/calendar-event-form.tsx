@@ -5,6 +5,7 @@ import { Dayjs } from 'dayjs';
 import { useEffect } from 'react';
 
 import { IconButton, Iconify } from '@/components/icon';
+import { useCopyToClipboard } from '@/hooks/event/use-copy-to-clipboard';
 
 import type { ModalProps } from 'antd/es/modal/interface';
 
@@ -48,6 +49,7 @@ export default function CalendarEventForm({
   const title = type === 'add' ? 'Add Event' : 'Edit Event';
   const [form] = Form.useForm();
   console.log('type', type);
+  const { copyFn } = useCopyToClipboard();
 
   useEffect(() => {
     const { color = COLORS[0], ...others } = initValues;
@@ -131,7 +133,12 @@ export default function CalendarEventForm({
         </Form.Item>
 
         <Form.Item<CalendarEventFormFieldType> label="Desc" name="description">
-          <Input.TextArea autoSave="description" autoSize size="large" />
+          <Input.TextArea
+            autoSave="description"
+            autoSize
+            size="large"
+            onClick={() => copyFn(form.getFieldValue('description'))}
+          />
         </Form.Item>
 
         <Form.Item<CalendarEventFormFieldType>
