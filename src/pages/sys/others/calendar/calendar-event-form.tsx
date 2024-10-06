@@ -125,7 +125,7 @@ export default function CalendarEventForm({
         initialValues={initValues}
       >
         <Form.Item<CalendarEventFormFieldType>
-          label="Titile"
+          label="Title"
           name="title"
           rules={[{ required: true, message: 'Please input title!' }]}
         >
