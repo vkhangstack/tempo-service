@@ -132,13 +132,8 @@ export default function CalendarEventForm({
           <Input />
         </Form.Item>
 
-        <Form.Item<CalendarEventFormFieldType> label="Desc" name="description">
-          <Input.TextArea
-            autoSave="description"
-            autoSize
-            size="large"
-            onClick={() => copyFn(form.getFieldValue('description'))}
-          />
+        <Form.Item<CalendarEventFormFieldType> label="Description" name="description">
+          <Input.TextArea autoSave="description" autoSize size="large" />
         </Form.Item>
 
         <Form.Item<CalendarEventFormFieldType>
