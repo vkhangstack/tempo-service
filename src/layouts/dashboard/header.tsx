@@ -5,6 +5,7 @@ import { CSSProperties, useMemo, useState } from 'react';
 import { IconButton, Iconify, SvgIcon } from '@/components/icon';
 import LocalePicker from '@/components/locale-picker';
 import Logo from '@/components/logo';
+import SendTeams from '@/pages/functions/sendTeams';
 import { useSettings } from '@/store/settingStore';
 import { useResponsive, useThemeToken } from '@/theme/hooks';
 import { getBytes, getMB } from '@/utils/buffer';
@@ -121,7 +122,7 @@ export default function Header({ className = '', offsetTop = false }: Props) {
             <div className="ml-4 hidden md:block">{breadCrumb ? <BreadCrumb /> : null}</div>
           </div>
 
-          <div className="flex">
+          <div className="flex gap-2">
             {warning && (
               <div className="group flex items-center justify-between gap-2 pr-4">
                 <Alert
@@ -139,6 +140,7 @@ export default function Header({ className = '', offsetTop = false }: Props) {
                 </Tooltip>
               </div>
             )}
+            <SendTeams />
             <SearchBar />
             <LocalePicker />
             <IconButton
