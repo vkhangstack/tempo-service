@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { useMutation } from '@tanstack/react-query';
 import { App } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +8,7 @@ import userService, { SignInReq } from '@/api/services/userService';
 import { getItem, removeItem, setItem } from '@/utils/storage';
 
 import { UserInfo, UserToken } from '#/entity';
-import { StorageEnum } from '#/enum';
+import { PermissionType, StorageEnum } from '#/enum';
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
@@ -61,7 +62,43 @@ export const useSignIn = () => {
       const res = await signInMutation.mutateAsync(data);
       const { user, accessToken, refreshToken } = res;
       setUserToken({ accessToken, refreshToken });
-      setUserInfo(user);
+      setUserInfo({
+        id: user.id.toString(),
+        username: 'admin',
+        email: faker.internet.email(),
+        avatar: faker.image.avatarGitHub(),
+        role: {
+          id: '4281707933534332',
+          name: 'Admin',
+          label: 'admin',
+          status: 1,
+          order: 1,
+          desc: 'Super Admin',
+          permission: [],
+        },
+        permissions: [
+          {
+            id: '3981225257359246',
+            parentId: '',
+            label: 'sys.menu.calendar',
+            name: 'Calendar',
+            icon: 'solar:calendar-bold-duotone',
+            type: PermissionType.MENU,
+            route: 'calendar',
+            component: '/sys/others/calendar/index.tsx',
+          },
+          {
+            id: '3513985683886393',
+            parentId: '',
+            label: 'sys.menu.kanban',
+            name: 'kanban',
+            icon: 'solar:clipboard-bold-duotone',
+            type: PermissionType.MENU,
+            route: 'kanban',
+            component: '/sys/others/kanban/index.tsx',
+          },
+        ],
+      });
       navigatge(HOMEPAGE, { replace: true });
     } catch (err) {
       message.warning({

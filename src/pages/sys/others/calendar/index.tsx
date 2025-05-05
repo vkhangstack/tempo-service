@@ -12,6 +12,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Card from '@/components/card';
 import { keyDataEvent } from '@/layouts/_common/enum';
 import { useSettings } from '@/store/settingStore';
+import { useGetTask } from '@/store/taskStore';
 import { useResponsive } from '@/theme/hooks';
 
 import CalendarEvent from './calendar-event';
@@ -46,6 +47,24 @@ export default function Calendar() {
       setView('listWeek');
     }
   }, [screenMap]);
+  const { status, data, error, isFetching } = useGetTask();
+  console.log('data', data);
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+    const newData = data?.map((item: any) => {
+      return {
+        ...item,
+        description: item.content,
+        start: dayjs(item.createdAt).toDate(),
+        end: dayjs(item.updatedAt).toDate(),
+      };
+    });
+
+    setDataEvents(newData);
+  }, [data]);
 
   useMemo(() => {
     const dataLocal = localStorage.getItem(keyDataEvent);

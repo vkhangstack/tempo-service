@@ -52,3 +52,14 @@ export interface Role {
   desc?: string;
   permission?: Permission[];
 }
+
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  allDay?: false;
+  start: string;
+  end: string;
+  textColor: string;
+  backgroundColor: string;
+}

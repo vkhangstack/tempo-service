@@ -14,6 +14,7 @@ export enum StorageEnum {
   Token = 'token',
   Settings = 'settings',
   I18N = 'i18nextLng',
+  Task = 'task',
 }
 
 export enum ThemeMode {

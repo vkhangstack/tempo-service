@@ -1,12 +1,10 @@
 import { Alert, Button, Checkbox, Col, Divider, Form, Input, Row } from 'antd';
-import Lottie from 'lottie-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiFillGithub, AiFillGoogleCircle, AiFillWechat } from 'react-icons/ai';
 
 import { DEFAULT_USER, TEST_USER } from '@/_mock/assets';
 import { SignInReq } from '@/api/services/userService';
-import dataJson from '@/assets/lotties/loading-find-file.json';
 import { useSignIn } from '@/store/userStore';
 import ProTag from '@/theme/antd/components/tag';
 import { useThemeToken } from '@/theme/hooks';
@@ -17,8 +15,6 @@ function LoginForm() {
   const { t } = useTranslation();
   const themeToken = useThemeToken();
   const [loading, setLoading] = useState(false);
-  const [autoLogin, setAutoLogin] = useState(true);
-  const [textAutoLogin, setTextAutoLogin] = useState('Automatically connecting to the system...');
 
   const { loginState, setLoginState } = useLoginStateContext();
   const signIn = useSignIn();
@@ -31,44 +27,36 @@ function LoginForm() {
       await signIn({ username, password });
     } finally {
       setLoading(false);
-      setAutoLogin(false);
     }
   };
-  setTimeout(() => {
-    setTextAutoLogin('Access successful');
-  }, 4200);
 
-  setTimeout(() => {
-    handleFinish({ username: DEFAULT_USER.username, password: DEFAULT_USER.password });
-  }, 5000);
+  // handleFinish({ username: DEFAULT_USER.username, password: DEFAULT_USER.password });
 
-  if (autoLogin) {
-    return (
-      <>
-        {/* <div className="mb-4 text-2xl font-bold xl:text-3xl">{t('sys.login.signInFormTitle')}</div> */}
-        <div className="mb-4 w-full text-center">
-          {/* <ThreeDLoader
-            colorRing1="#347928"
-            colorRing2="#FCCD2A"
-            desktopSize="100px"
-            className="w-full"
-            mobileSize="64px"
-          /> */}
-          {/* <ScatterBoxLoader
-            primaryColor="#6366F1"
-            background="#FFFFFF"
-            desktopSize="50px"
-            className="w-full"
-            mobileSize="64px"
-            size="32px"
-          /> */}
-          <Lottie animationData={dataJson} loop />
+  // return (
+  //   <>
+  //     {/* <div className="mb-4 text-2xl font-bold xl:text-3xl">{t('sys.login.signInFormTitle')}</div> */}
+  //     <div className="mb-4 w-full text-center">
+  //       {/* <ThreeDLoader
+  //           colorRing1="#347928"
+  //           colorRing2="#FCCD2A"
+  //           desktopSize="100px"
+  //           className="w-full"
+  //           mobileSize="64px"
+  //         /> */}
+  //       {/* <ScatterBoxLoader
+  //           primaryColor="#6366F1"
+  //           background="#FFFFFF"
+  //           desktopSize="50px"
+  //           className="w-full"
+  //           mobileSize="64px"
+  //           size="32px"
+  //         /> */}
+  //       <Lottie animationData={dataJson} loop />
 
-          <span className="break-words text-2xl font-thin">{textAutoLogin}</span>
-        </div>
-      </>
-    );
-  }
+  //       <span className="break-words text-2xl font-thin">{textAutoLogin}</span>
+  //     </div>
+  //   </>
+  // );
 
   return (
     <>
