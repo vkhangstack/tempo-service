@@ -36,7 +36,7 @@ export const useTaskActions = () => useTaskStore((state) => state.actions);
 
 export const useGetTask = () => {
   const navigatge = useNavigate();
-  const { message } = App.useApp();
+  App.useApp();
   const { accessToken } = useUserToken();
   console.log('accessToken', accessToken);
 
@@ -45,7 +45,6 @@ export const useGetTask = () => {
     return;
   }
 
-  const getListTask = async () => {};
   // eslint-disable-next-line consistent-return, react-hooks/rules-of-hooks
   return useQuery({
     queryKey: ['tasks'],

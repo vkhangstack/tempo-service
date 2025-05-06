@@ -109,7 +109,9 @@ export default function CalendarEventForm({
             if (type === 'edit') onEdit(event);
             onCancel();
           })
-          .catch((info) => {});
+          .catch((err) => {
+            console.error(err);
+          });
       }}
     >
       <Form

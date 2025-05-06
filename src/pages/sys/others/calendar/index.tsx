@@ -7,12 +7,13 @@ import listPlugin from '@fullcalendar/list'; // listWeek view
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid'; // timeGridWeek, timeGridDay, timeGrid
 import dayjs from 'dayjs';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 
+import taskService from '@/api/services/taskService';
 import Card from '@/components/card';
 import { keyDataEvent } from '@/layouts/_common/enum';
 import { useSettings } from '@/store/settingStore';
-import { useGetTask } from '@/store/taskStore';
+import { useUserToken } from '@/store/userStore';
 import { useResponsive } from '@/theme/hooks';
 
 import CalendarEvent from './calendar-event';
@@ -41,38 +42,53 @@ export default function Calendar() {
 
   const { themeMode } = useSettings();
   const { screenMap } = useResponsive();
+  const { accessToken } = useUserToken();
+  const [, forceRender] = useReducer((x) => x + 1, 0);
 
   useEffect(() => {
     if (screenMap.xs) {
       setView('listWeek');
     }
   }, [screenMap]);
-  const { status, data, error, isFetching } = useGetTask();
-  console.log('data', data);
 
+  /** TODO: Đại đại đi rồi refactor cho clean */
   useEffect(() => {
-    if (!data) {
+    if (!accessToken) {
       return;
     }
-    const newData = data?.map((item: any) => {
-      return {
-        ...item,
-        description: item.content,
-        start: dayjs(item.createdAt).toDate(),
-        end: dayjs(item.updatedAt).toDate(),
-      };
-    });
+    taskService
+      .listTask(accessToken as string)
+      .then((res) => {
+        if (!res || res.length === 0) {
+          return;
+        }
+        const newData = res?.map((item: any) => {
+          return {
+            ...item,
+            color: item?.backgroundColor as string,
+            description: item.content,
+            start: dayjs(item.start).toDate(),
+            end: dayjs(item.end).toDate(),
+            backgroundColor: '#fff',
+            textColor: item?.backgroundColor as string,
+          };
+        });
 
-    setDataEvents(newData);
-  }, [data]);
+        setDataEvents(newData);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, [accessToken]);
 
-  useMemo(() => {
-    const dataLocal = localStorage.getItem(keyDataEvent);
-    if (!dataLocal || dataLocal === '' || dataLocal === '[]') {
-      localStorage.setItem(keyDataEvent, JSON.stringify([]));
-    }
-    setDataEvents(JSON.parse(dataLocal as string));
-  }, []);
+  console.log('dataE', dataEvents);
+  // useMemo(() => {
+  //   const dataLocal = localStorage.getItem(keyDataEvent);
+  //   if (!dataLocal || dataLocal === '' || dataLocal === '[]') {
+  //     localStorage.setItem(keyDataEvent, JSON.stringify([]));
+  //   }
+  //   setDataEvents(JSON.parse(dataLocal as string));
+  // }, []);
   /**
    * calendar header events
    */
@@ -172,27 +188,47 @@ export default function Calendar() {
 
     oldEvent?.remove();
     calendarApi.addEvent(newEvent);
-
     /** logic set localStorage */
-    let dataLocal: any = localStorage.getItem(keyDataEvent);
-    if (dataLocal) {
-      dataLocal = JSON.parse(dataLocal);
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < dataLocal.length; i++) {
-        if (dataLocal[i].id === id) {
-          dataLocal[i].title = newEvent.title; // Update title if provided
-          dataLocal[i].extendedProps.description = newEvent.extendedProps.description; // Update start date if provided
-          dataLocal[i].allDay = newEvent.allDay; // Update end date if provided
-          dataLocal[i].color = newEvent.color;
-          dataLocal[i].start = newEvent.start;
-          dataLocal[i].end = newEvent.end;
-          localStorage.setItem(keyDataEvent, JSON.stringify(dataLocal));
-          break;
-        }
-      }
-    }
-
+    // let dataLocal: any = localStorage.getItem(keyDataEvent);
+    // if (dataLocal) {
+    //   dataLocal = JSON.parse(dataLocal);
+    //   // eslint-disable-next-line no-plusplus
+    //   for (let i = 0; i < dataLocal.length; i++) {
+    //     if (dataLocal[i].id === id) {
+    //       dataLocal[i].title = newEvent.title; // Update title if provided
+    //       dataLocal[i].extendedProps.description = newEvent.extendedProps.description; // Update start date if provided
+    //       dataLocal[i].allDay = newEvent.allDay; // Update end date if provided
+    //       dataLocal[i].color = newEvent.color;
+    //       dataLocal[i].start = newEvent.start;
+    //       dataLocal[i].end = newEvent.end;
+    //       localStorage.setItem(keyDataEvent, JSON.stringify(dataLocal));
+    //       break;
+    //     }
+    //   }
+    // }
     /** logic set localStorage */
+
+    taskService
+      .updateTask(
+        {
+          id: Number(values.id),
+          title,
+          content: description ?? '',
+          start: newEvent.start as any,
+          end: newEvent.end as any,
+          allDay,
+          textColor: color as string,
+          backgroundColor: '#ffffff',
+        },
+        accessToken as string,
+      )
+      .then(() => {
+        // if (res) {
+        //   setDataEvents(res);
+        // }
+        forceRender();
+      })
+      .catch((err) => console.error(err));
   };
   // create event
   const handleCreate = (values: CalendarEventFormFieldType) => {
@@ -211,16 +247,37 @@ export default function Calendar() {
     if (start) newEvent.start = start.toDate();
     if (end) newEvent.end = end.toDate();
 
-    calendarApi.addEvent(newEvent);
+    /** TODO: Đại đại đi rồi refactor cho clean */
+    taskService
+      .createTask(
+        {
+          title,
+          content: description ?? '',
+          start: start as any,
+          end: end as any,
+          allDay,
+          textColor: color as string,
+          backgroundColor: '#ffffff',
+        },
+        accessToken as string,
+      )
+      .then((res) => {
+        if (!res || res.length === 0) {
+          return;
+        }
 
-    /** logic set localStorage */
-    let dataLocal: any = localStorage.getItem(keyDataEvent);
+        dataEvents.push({
+          ...res,
+          description: res.content,
+          start: dayjs(res.start).toDate(),
+          end: dayjs(res.end).toDate(),
+        });
 
-    dataLocal = JSON.parse(dataLocal as string);
-    dataLocal.push(newEvent);
-    localStorage.setItem(keyDataEvent, JSON.stringify(dataLocal));
-
-    /** logic set localStorage */
+        newEvent.id = String(res.id);
+        calendarApi.addEvent(newEvent);
+        setDataEvents(dataEvents);
+      })
+      .catch((err) => console.error(err));
   };
   // delete event
   const handleDelete = (id: string) => {

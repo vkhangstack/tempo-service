@@ -54,10 +54,10 @@ export interface Role {
 }
 
 export interface Task {
-  id: number;
+  id?: number;
   title: string;
-  description: string;
-  allDay?: false;
+  description?: string;
+  allDay: boolean;
   start: string;
   end: string;
   textColor: string;
