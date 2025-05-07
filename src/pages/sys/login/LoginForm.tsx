@@ -1,12 +1,10 @@
-import { Alert, Button, Checkbox, Col, Divider, Form, Input, Row } from 'antd';
+import { Button, Checkbox, Col, Divider, Form, Input, Row } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiFillGithub, AiFillGoogleCircle, AiFillWechat } from 'react-icons/ai';
 
-import { DEFAULT_USER, TEST_USER } from '@/_mock/assets';
 import { SignInReq } from '@/api/services/userService';
 import { useSignIn } from '@/store/userStore';
-import ProTag from '@/theme/antd/components/tag';
 import { useThemeToken } from '@/theme/hooks';
 
 import { LoginStateEnum, useLoginStateContext } from './providers/LoginStateProvider';
@@ -66,12 +64,12 @@ function LoginForm() {
         size="large"
         initialValues={{
           remember: true,
-          username: DEFAULT_USER.username,
-          password: DEFAULT_USER.password,
+          username: '',
+          password: '',
         }}
         onFinish={handleFinish}
       >
-        <div className="mb-4 flex flex-col">
+        {/* <div className="mb-4 flex flex-col">
           <Alert
             type="info"
             description={
@@ -100,7 +98,7 @@ function LoginForm() {
             }
             showIcon
           />
-        </div>
+        </div> */}
 
         <Form.Item
           name="username"
@@ -140,7 +138,7 @@ function LoginForm() {
         </Form.Item>
 
         <Row align="middle" gutter={8}>
-          <Col span={9} flex="1">
+          {/* <Col span={9} flex="1">
             <Button
               className="w-full !text-sm"
               onClick={() => setLoginState(LoginStateEnum.MOBILE)}
@@ -155,8 +153,11 @@ function LoginForm() {
             >
               {t('sys.login.qrSignInFormTitle')}
             </Button>
-          </Col>
-          <Col span={6} flex="1" onClick={() => setLoginState(LoginStateEnum.REGISTER)}>
+          </Col> */}
+          {/* <Col span={18} flex="1">
+            <LoginButtonTeams />
+          </Col> */}
+          <Col span={24} flex="1" onClick={() => setLoginState(LoginStateEnum.REGISTER)}>
             <Button className="w-full !text-sm">{t('sys.login.signUpFormTitle')}</Button>
           </Col>
         </Row>

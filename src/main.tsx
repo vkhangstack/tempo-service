@@ -9,10 +9,14 @@ import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 // eslint-disable-next-line import/no-unresolved
 import 'virtual:svg-icons-register';
+import { PublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
 
 import App from '@/App';
 
-import worker from './_mock';
+import { msalConfig } from './utils/msteams';
+
+// import worker from './_mock';
 // i18n
 import './locales/i18n';
 // tailwind css
@@ -29,12 +33,14 @@ const queryClient = new QueryClient({
       retry: 3,
       gcTime: 300_000, // 5m
       staleTime: 10_1000, // 10s
-      refetchOnWindowFocus: false, 
-      refetchOnReconnect: false, 
-      refetchOnMount: false, 
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
     },
   },
 });
+
+const msalInstance = new PublicClientApplication(msalConfig);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -44,11 +50,14 @@ root.render(
       <ReactQueryDevtools initialIsOpen={false} />
       <Suspense>
         <Analytics />
-        <App />
+        <MsalProvider instance={msalInstance}>
+          <App />
+        </MsalProvider>
+        ,
       </Suspense>
     </QueryClientProvider>
   </HelmetProvider>,
 );
 
 // 🥵 start service worker mock in development mode
-worker.start({ onUnhandledRequest: 'bypass' });
+// worker.start({ onUnhandledRequest: 'bypass' });
