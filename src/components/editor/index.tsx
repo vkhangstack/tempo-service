@@ -1,7 +1,7 @@
 /* eslint-disable import/order */
 import '@/utils/highlight';
 import ReactQuill, { ReactQuillProps } from 'react-quill';
-import Toolbar, { formats } from './toolbar';
+import { formats } from './toolbar';
 import { useSettings } from '@/store/settingStore';
 import { useThemeToken } from '@/theme/hooks';
 import { StyledEditor } from './styles';
@@ -14,7 +14,8 @@ export default function Editor({ id = 'slash-quill', sample = false, ...other }:
   const { themeMode } = useSettings();
   const modules = {
     toolbar: {
-      container: `#${id}`,
+      // container: `#${id}`,
+      id: `${id}`,
     },
     history: {
       delay: 500,
@@ -28,7 +29,7 @@ export default function Editor({ id = 'slash-quill', sample = false, ...other }:
   };
   return (
     <StyledEditor $token={token} $thememode={themeMode}>
-      <Toolbar id={id} isSimple={sample} />
+      {/* <Toolbar id={id} isSimple={sample} /> */}
       <ReactQuill
         modules={modules}
         formats={formats}

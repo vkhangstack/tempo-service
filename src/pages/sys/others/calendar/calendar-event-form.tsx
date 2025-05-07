@@ -2,8 +2,9 @@ import { faker } from '@faker-js/faker';
 import { EventInput } from '@fullcalendar/core';
 import { ColorPicker, DatePicker, Form, Input, Modal, Switch } from 'antd';
 import { Dayjs } from 'dayjs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
+import Editor from '@/components/editor';
 import { IconButton, Iconify } from '@/components/icon';
 
 import type { ModalProps } from 'antd/es/modal/interface';
@@ -47,6 +48,8 @@ export default function CalendarEventForm({
 }: Props) {
   const title = type === 'add' ? 'Add Event' : 'Edit Event';
   const [form] = Form.useForm();
+
+  const [quillFull, setQuillFull] = useState('');
 
   useEffect(() => {
     const { color = COLORS[0], ...others } = initValues;
@@ -131,6 +134,7 @@ export default function CalendarEventForm({
 
         <Form.Item<CalendarEventFormFieldType> label="Description" name="description">
           {/* <Input.TextArea autoSave="description" autoSize size="large" /> */}
+          <Editor id="full-editor" value={quillFull} onChange={setQuillFull} />
         </Form.Item>
 
         <Form.Item<CalendarEventFormFieldType>
