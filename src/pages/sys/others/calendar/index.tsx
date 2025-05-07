@@ -64,13 +64,18 @@ export default function Calendar() {
         }
         const newData = res?.map((item: any) => {
           return {
-            ...item,
-            color: item?.backgroundColor as string,
+            // ...item,
+            id: String(item.id),
+            title: item.title,
+            allDay: item.allDay,
+            color: item?.textColor as string,
             description: item.content,
             start: dayjs(item.start).toDate(),
             end: dayjs(item.end).toDate(),
-            backgroundColor: '#fff',
-            textColor: item?.backgroundColor as string,
+            // backgroundColor: '#fff',
+            // textColor: item?.backgroundColor as string,
+            // backgroundColor: undefined,
+            // textColor: undefined,
           };
         });
 
@@ -81,7 +86,6 @@ export default function Calendar() {
       });
   }, [accessToken]);
 
-  console.log('dataE', dataEvents);
   // useMemo(() => {
   //   const dataLocal = localStorage.getItem(keyDataEvent);
   //   if (!dataLocal || dataLocal === '' || dataLocal === '[]') {
@@ -207,11 +211,10 @@ export default function Calendar() {
     //   }
     // }
     /** logic set localStorage */
-
     taskService
       .updateTask(
         {
-          id: Number(values.id),
+          id: values.id,
           title,
           content: description ?? '',
           start: newEvent.start as any,
@@ -267,7 +270,10 @@ export default function Calendar() {
         }
 
         dataEvents.push({
-          ...res,
+          id: res.id,
+          title: res.title,
+          allDay: res.allDay,
+          color: res?.textColor as string,
           description: res.content,
           start: dayjs(res.start).toDate(),
           end: dayjs(res.end).toDate(),

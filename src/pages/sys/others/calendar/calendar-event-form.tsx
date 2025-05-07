@@ -130,7 +130,7 @@ export default function CalendarEventForm({
         </Form.Item>
 
         <Form.Item<CalendarEventFormFieldType> label="Description" name="description">
-          <Input.TextArea autoSave="description" autoSize size="large" />
+          {/* <Input.TextArea autoSave="description" autoSize size="large" /> */}
         </Form.Item>
 
         <Form.Item<CalendarEventFormFieldType>

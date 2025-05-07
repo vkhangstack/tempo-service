@@ -54,7 +54,7 @@ export interface Role {
 }
 
 export interface Task {
-  id?: number;
+  id?: number | string;
   title: string;
   description?: string;
   allDay: boolean;

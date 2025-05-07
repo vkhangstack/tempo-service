@@ -1,5 +1,6 @@
 import { message as Message } from 'antd';
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
+import JSONbig from 'json-bigint';
 
 import { t } from '@/locales/i18n';
 import userStore from '@/store/userStore';
@@ -9,8 +10,17 @@ import { ResultEnum } from '#/enum';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json;charset=utf-8' },
+  timeout: 5000,
+  headers: { 'Content-Type': 'application/json' },
+  transformResponse: [
+    (data) => {
+      try {
+        return JSONbig({ storeAsString: true }).parse(data);
+      } catch (e) {
+        return data;
+      }
+    },
+  ],
 });
 
 axiosInstance.interceptors.request.use(
