@@ -117,6 +117,7 @@ export default function Calendar() {
   };
   const handleDailyTeams = () => {
     // Lấy task hôm qua và hôm nay
+    let titleFirst = '𝗬𝗲𝘀𝘁𝗲𝗿𝗱𝗮𝘆:';
     const taskYesterday = tasks.find((item) => {
       if (!item?.start) {
         return '';
@@ -124,6 +125,7 @@ export default function Calendar() {
       if (dayjs().day() === 1) {
         // Nếu hôm nay là thứ 2 thì lấy thứ 6 tuần trước
         // return dayjs(item?.start).isSame(dayjs().subtract(3, 'day'), 'day') && item.title === 'daily';
+        titleFirst = '𝗟𝗮𝘀𝘁 𝗙𝗿𝗶𝗱𝗮𝘆:';
         return (
           dayjs(item?.start).isSame(dayjs().subtract(3, 'day'), 'day') && item.title === 'daily'
         );
@@ -154,7 +156,7 @@ export default function Calendar() {
         : '<ul><li>No tasks found</li></ul>'
     }`;
 
-    const tmp = `𝗬𝗲𝘀𝘁𝗲𝗿𝗱𝗮𝘆:
+    const tmp = `${titleFirst}
     ${taskYesterday?.description
       ?.split(/<li>(.*?)<\/li>/g)
       .filter((item) => item !== '' && item !== '<ul>' && item !== '</ul>')
