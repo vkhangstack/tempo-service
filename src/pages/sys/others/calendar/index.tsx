@@ -1,4 +1,3 @@
-import { useMsal } from '@azure/msal-react';
 import { faker } from '@faker-js/faker';
 import { DateSelectArg, EventClickArg, EventInput } from '@fullcalendar/core';
 //  fullcalendar plugins
@@ -16,7 +15,6 @@ import { useSettings } from '@/store/settingStore';
 import { useTaskActions, useTasks } from '@/store/taskStore';
 import { useUserToken } from '@/store/userStore';
 import { useResponsive } from '@/theme/hooks';
-import { loginRequest } from '@/utils/msteams';
 
 import CalendarEvent from './calendar-event';
 import CalendarEventForm, { CalendarEventFormFieldType } from './calendar-event-form';
@@ -72,7 +70,7 @@ export default function Calendar() {
             id: String(item.id),
             title: item.title,
             allDay: item.allDay,
-            // color: item?.textColor as string,
+            color: item?.textColor as string,
             description: item.content,
             start: dayjs(item.start).toDate(),
             end: dayjs(item.end).toDate(),
@@ -80,7 +78,6 @@ export default function Calendar() {
             // backgroundColor: '#fff',
             // textColor: item?.backgroundColor as string,
             // backgroundColor: undefined,
-            textColor: '#fff',
           };
         });
         setTasks(newData);
@@ -272,44 +269,6 @@ export default function Calendar() {
       })
       .catch((err) => console.error(err));
   };
-  const { instance } = useMsal();
-  const handleDaily = (values: CalendarEventFormFieldType) => {
-    if (!values.isDaily) {
-      handleCreate(values);
-      return;
-    }
-
-    const handleLogin = () => {
-      instance
-        .loginPopup(loginRequest)
-        .then((res) => {
-          handleCreate(values, res.accessToken);
-        })
-        .catch((e) => {
-          console.error(e);
-        });
-    };
-    handleLogin();
-  };
-
-  const handleEditDaily = (values: CalendarEventFormFieldType) => {
-    if (!values.isDaily) {
-      handleEdit(values);
-      return;
-    }
-
-    const handleLogin = () => {
-      instance
-        .loginPopup(loginRequest)
-        .then((res) => {
-          handleEdit(values, res.accessToken);
-        })
-        .catch((e) => {
-          console.error(e);
-        });
-    };
-    handleLogin();
-  };
 
   return (
     <Card className="h-full w-full">
@@ -347,8 +306,6 @@ export default function Calendar() {
         onDelete={handleDelete}
         onCreate={handleCreate}
         onEdit={handleEdit}
-        onDaily={handleDaily}
-        onEditDaily={handleEditDaily}
       />
     </Card>
   );

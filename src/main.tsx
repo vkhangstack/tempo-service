@@ -9,16 +9,13 @@ import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 // eslint-disable-next-line import/no-unresolved
 import 'virtual:svg-icons-register';
-import { PublicClientApplication } from '@azure/msal-browser';
-import { MsalProvider } from '@azure/msal-react';
 
 import App from '@/App';
 
-import { msalConfig } from './utils/msteams';
+import './locales/i18n';
 
 // import worker from './_mock';
 // i18n
-import './locales/i18n';
 // tailwind css
 import './theme/index.css';
 
@@ -40,7 +37,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const msalInstance = new PublicClientApplication(msalConfig);
+// const msalInstance = new PublicClientApplication(msalConfig);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -50,10 +47,9 @@ root.render(
       <ReactQueryDevtools initialIsOpen={false} />
       <Suspense>
         <Analytics />
-        <MsalProvider instance={msalInstance}>
-          <App />
-        </MsalProvider>
-        ,
+        {/* <MsalProvider instance={msalInstance}> */}
+        <App />
+        {/* </MsalProvider> */},
       </Suspense>
     </QueryClientProvider>
   </HelmetProvider>,

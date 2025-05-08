@@ -24,8 +24,6 @@ type Props = {
   onEdit: (event: CalendarEventFormFieldType) => void;
   onCreate: (event: CalendarEventFormFieldType) => void;
   onDelete: (id: string) => void;
-  onDaily: (event: CalendarEventFormFieldType) => void;
-  onEditDaily: (event: CalendarEventFormFieldType) => void;
   initValues: CalendarEventFormFieldType;
 };
 
@@ -48,8 +46,6 @@ export default function CalendarEventForm({
   onEdit,
   onCreate,
   onDelete,
-  onDaily,
-  onEditDaily,
 }: Props) {
   const title = type === 'add' ? 'Add Event' : 'Edit Event';
   const [form] = Form.useForm();
@@ -114,18 +110,10 @@ export default function CalendarEventForm({
             const { id } = initValues;
             const event = { ...values, id };
             if (type === 'add') {
-              if (values.isDaily === true) {
-                onDaily(event);
-              } else {
-                onCreate(event);
-              }
+              onCreate(event);
             }
             if (type === 'edit') {
-              if (values.isDaily === true) {
-                onEditDaily(event);
-              } else {
-                onEdit(event);
-              }
+              onEdit(event);
             }
             onCancel();
           })
@@ -191,13 +179,6 @@ export default function CalendarEventForm({
               },
             ]}
           />
-        </Form.Item>
-        <Form.Item<CalendarEventFormFieldType>
-          label="Daily now"
-          name="isDaily"
-          valuePropName="checked"
-        >
-          <Switch />
         </Form.Item>
       </Form>
     </Modal>
