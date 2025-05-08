@@ -8,7 +8,7 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid'; // timeGridWeek, timeGridDay, timeGrid
 import { Modal } from 'antd';
 import dayjs from 'dayjs';
-import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import taskService from '@/api/services/taskService';
 import Card from '@/components/card';
@@ -49,7 +49,6 @@ export default function Calendar() {
   const { themeMode } = useSettings();
   const { screenMap } = useResponsive();
   const { accessToken } = useUserToken();
-  const [, forceRender] = useReducer((x) => x + 1, 0);
   const { setTasks } = useTaskActions();
   const tasks = useTasks();
   useEffect(() => {
@@ -58,8 +57,7 @@ export default function Calendar() {
     }
   }, [screenMap]);
 
-  /** TODO: Đại đại đi rồi refactor cho clean */
-  useEffect(() => {
+  const getListTask = () => {
     if (!accessToken) {
       return;
     }
@@ -85,16 +83,17 @@ export default function Calendar() {
             // backgroundColor: undefined,
           };
         });
-        if (newData.length !== tasks.length) {
-          setTasks(newData);
-        }
+        setTasks(newData);
       })
       .catch((err) => {
         console.error(err);
       });
-
+  };
+  /** TODO: Đại đại đi rồi refactor cho clean */
+  useEffect(() => {
+    getListTask();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken, setTasks]);
+  }, [accessToken]);
 
   /**
    * calendar header events
@@ -281,7 +280,7 @@ export default function Calendar() {
         accessToken as string,
       )
       .then(() => {
-        forceRender();
+        getListTask();
       })
       .catch((err) => console.error(err));
   };
@@ -326,7 +325,7 @@ export default function Calendar() {
 
         newEvent.id = String(res.id);
         calendarApi.addEvent(newEvent);
-        forceRender();
+        getListTask();
       })
       .catch((err) => console.error(err));
   };
@@ -339,7 +338,7 @@ export default function Calendar() {
     taskService
       .deleteTask(id, accessToken as string)
       .then(() => {
-        forceRender();
+        getListTask();
       })
       .catch((err) => console.error(err));
   };
