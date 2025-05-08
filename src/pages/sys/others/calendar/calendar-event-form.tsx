@@ -14,6 +14,7 @@ export type CalendarEventFormFieldType = Pick<EventInput, 'title' | 'allDay' | '
   description?: string;
   start?: Dayjs;
   end?: Dayjs;
+  isDaily?: boolean;
 };
 
 type Props = {
@@ -23,6 +24,8 @@ type Props = {
   onEdit: (event: CalendarEventFormFieldType) => void;
   onCreate: (event: CalendarEventFormFieldType) => void;
   onDelete: (id: string) => void;
+  onDaily: (event: CalendarEventFormFieldType) => void;
+  onEditDaily: (event: CalendarEventFormFieldType) => void;
   initValues: CalendarEventFormFieldType;
 };
 
@@ -41,10 +44,12 @@ export default function CalendarEventForm({
   type,
   open,
   onCancel,
-  initValues = { id: faker.string.uuid() },
+  initValues = { id: faker.string.uuid(), isDaily: false },
   onEdit,
   onCreate,
   onDelete,
+  onDaily,
+  onEditDaily,
 }: Props) {
   const title = type === 'add' ? 'Add Event' : 'Edit Event';
   const [form] = Form.useForm();
@@ -108,8 +113,20 @@ export default function CalendarEventForm({
 
             const { id } = initValues;
             const event = { ...values, id };
-            if (type === 'add') onCreate(event);
-            if (type === 'edit') onEdit(event);
+            if (type === 'add') {
+              if (values.isDaily === true) {
+                onDaily(event);
+              } else {
+                onCreate(event);
+              }
+            }
+            if (type === 'edit') {
+              if (values.isDaily === true) {
+                onEditDaily(event);
+              } else {
+                onEdit(event);
+              }
+            }
             onCancel();
           })
           .catch((err) => {
@@ -119,7 +136,7 @@ export default function CalendarEventForm({
     >
       <Form
         form={form}
-        size="small"
+        size="middle"
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 18 }}
         initialValues={initValues}
@@ -174,6 +191,13 @@ export default function CalendarEventForm({
               },
             ]}
           />
+        </Form.Item>
+        <Form.Item<CalendarEventFormFieldType>
+          label="Daily now"
+          name="isDaily"
+          valuePropName="checked"
+        >
+          <Switch />
         </Form.Item>
       </Form>
     </Modal>

@@ -1,3 +1,4 @@
+import { useMsal } from '@azure/msal-react';
 import { faker } from '@faker-js/faker';
 import { DateSelectArg, EventClickArg, EventInput } from '@fullcalendar/core';
 //  fullcalendar plugins
@@ -15,6 +16,7 @@ import { useSettings } from '@/store/settingStore';
 import { useTaskActions, useTasks } from '@/store/taskStore';
 import { useUserToken } from '@/store/userStore';
 import { useResponsive } from '@/theme/hooks';
+import { loginRequest } from '@/utils/msteams';
 
 import CalendarEvent from './calendar-event';
 import CalendarEventForm, { CalendarEventFormFieldType } from './calendar-event-form';
@@ -29,6 +31,7 @@ const DefaultEventInitValue = {
   start: dayjs(),
   end: dayjs(),
   color: '',
+  isDaily: false,
 };
 export default function Calendar() {
   const fullCalendarRef = useRef<FullCalendar>(null);
@@ -69,17 +72,17 @@ export default function Calendar() {
             id: String(item.id),
             title: item.title,
             allDay: item.allDay,
-            color: item?.textColor as string,
+            // color: item?.textColor as string,
             description: item.content,
             start: dayjs(item.start).toDate(),
             end: dayjs(item.end).toDate(),
+            isDaily: item.isDaily,
             // backgroundColor: '#fff',
             // textColor: item?.backgroundColor as string,
             // backgroundColor: undefined,
-            // textColor: undefined,
+            textColor: '#fff',
           };
         });
-
         setTasks(newData);
       })
       .catch((err) => {
@@ -87,13 +90,6 @@ export default function Calendar() {
       });
   }, [accessToken, setTasks]);
 
-  // useMemo(() => {
-  //   const dataLocal = localStorage.getItem(keyDataEvent);
-  //   if (!dataLocal || dataLocal === '' || dataLocal === '[]') {
-  //     localStorage.setItem(keyDataEvent, JSON.stringify([]));
-  //   }
-  //   setDataEvents(JSON.parse(dataLocal as string));
-  // }, []);
   /**
    * calendar header events
    */
@@ -141,6 +137,7 @@ export default function Calendar() {
       start: dayjs(selectInfo.startStr),
       end: dayjs(selectInfo.endStr),
       allDay: selectInfo.allDay,
+      isDaily: false,
     });
   };
 
@@ -158,6 +155,7 @@ export default function Calendar() {
       allDay,
       color: backgroundColor,
       description: extendedProps.description,
+      isDaily: extendedProps.isDaily,
     };
     if (start) {
       newEventValue.start = dayjs(start);
@@ -174,8 +172,8 @@ export default function Calendar() {
     setEventFormType('add');
   };
   // edit event
-  const handleEdit = (values: CalendarEventFormFieldType) => {
-    const { id, title = '', description, start, end, allDay = false, color } = values;
+  const handleEdit = (values: CalendarEventFormFieldType, token?: string) => {
+    const { id, title = '', description, start, end, allDay = false, color, isDaily } = values;
     const calendarApi = fullCalendarRef.current!.getApi();
     const oldEvent = calendarApi.getEventById(id);
 
@@ -186,6 +184,7 @@ export default function Calendar() {
       color,
       extendedProps: {
         description,
+        isDaily,
       },
     };
     if (start) newEvent.start = start.toDate();
@@ -193,25 +192,7 @@ export default function Calendar() {
 
     oldEvent?.remove();
     calendarApi.addEvent(newEvent);
-    /** logic set localStorage */
-    // let dataLocal: any = localStorage.getItem(keyDataEvent);
-    // if (dataLocal) {
-    //   dataLocal = JSON.parse(dataLocal);
-    //   // eslint-disable-next-line no-plusplus
-    //   for (let i = 0; i < dataLocal.length; i++) {
-    //     if (dataLocal[i].id === id) {
-    //       dataLocal[i].title = newEvent.title; // Update title if provided
-    //       dataLocal[i].extendedProps.description = newEvent.extendedProps.description; // Update start date if provided
-    //       dataLocal[i].allDay = newEvent.allDay; // Update end date if provided
-    //       dataLocal[i].color = newEvent.color;
-    //       dataLocal[i].start = newEvent.start;
-    //       dataLocal[i].end = newEvent.end;
-    //       localStorage.setItem(keyDataEvent, JSON.stringify(dataLocal));
-    //       break;
-    //     }
-    //   }
-    // }
-    /** logic set localStorage */
+
     taskService
       .updateTask(
         {
@@ -223,6 +204,8 @@ export default function Calendar() {
           allDay,
           textColor: color as string,
           backgroundColor: '#ffffff',
+          isDaily,
+          token,
         },
         accessToken as string,
       )
@@ -232,9 +215,9 @@ export default function Calendar() {
       .catch((err) => console.error(err));
   };
   // create event
-  const handleCreate = (values: CalendarEventFormFieldType) => {
+  const handleCreate = (values: CalendarEventFormFieldType, token?: string) => {
     const calendarApi = fullCalendarRef.current!.getApi();
-    const { title = '', description, start, end, allDay = false, color } = values;
+    const { title = '', description, start, end, allDay = false, color, isDaily } = values;
 
     const newEvent: EventInput = {
       id: faker.string.uuid(),
@@ -243,6 +226,7 @@ export default function Calendar() {
       color,
       extendedProps: {
         description,
+        isDaily,
       },
     };
     if (start) newEvent.start = start.toDate();
@@ -259,6 +243,8 @@ export default function Calendar() {
           allDay,
           textColor: color as string,
           backgroundColor: '#ffffff',
+          isDaily,
+          token,
         },
         accessToken as string,
       )
@@ -267,19 +253,9 @@ export default function Calendar() {
           return;
         }
 
-        tasks.push({
-          id: res.id,
-          title: res.title,
-          allDay: res.allDay,
-          color: res?.textColor as string,
-          description: res.content,
-          start: dayjs(res.start).toDate(),
-          end: dayjs(res.end).toDate(),
-        });
-
         newEvent.id = String(res.id);
         calendarApi.addEvent(newEvent);
-        setTasks(tasks);
+        forceRender();
       })
       .catch((err) => console.error(err));
   };
@@ -295,15 +271,44 @@ export default function Calendar() {
         forceRender();
       })
       .catch((err) => console.error(err));
-    /** logic set localStorage */
+  };
+  const { instance } = useMsal();
+  const handleDaily = (values: CalendarEventFormFieldType) => {
+    if (!values.isDaily) {
+      handleCreate(values);
+      return;
+    }
 
-    // const dataLocal = localStorage.getItem(keyDataEvent);
-    // const dataEvents = JSON.parse(dataLocal as string);
+    const handleLogin = () => {
+      instance
+        .loginPopup(loginRequest)
+        .then((res) => {
+          handleCreate(values, res.accessToken);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    };
+    handleLogin();
+  };
 
-    // const newEvent = dataEvents?.filter((event: EventInput) => event.id !== id);
-    // localStorage.setItem(keyDataEvent, JSON.stringify(newEvent));
+  const handleEditDaily = (values: CalendarEventFormFieldType) => {
+    if (!values.isDaily) {
+      handleEdit(values);
+      return;
+    }
 
-    /** logic set localStorage */
+    const handleLogin = () => {
+      instance
+        .loginPopup(loginRequest)
+        .then((res) => {
+          handleEdit(values, res.accessToken);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    };
+    handleLogin();
   };
 
   return (
@@ -342,6 +347,8 @@ export default function Calendar() {
         onDelete={handleDelete}
         onCreate={handleCreate}
         onEdit={handleEdit}
+        onDaily={handleDaily}
+        onEditDaily={handleEditDaily}
       />
     </Card>
   );

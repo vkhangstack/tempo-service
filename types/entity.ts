@@ -63,4 +63,6 @@ export interface Task {
   textColor?: string;
   backgroundColor?: string;
   color?: string;
+  token?: string;
+  isDaily?: boolean;
 }
