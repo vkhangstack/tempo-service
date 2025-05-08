@@ -11,7 +11,6 @@ import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 
 import taskService from '@/api/services/taskService';
 import Card from '@/components/card';
-import { keyDataEvent } from '@/layouts/_common/enum';
 import { useSettings } from '@/store/settingStore';
 import { useUserToken } from '@/store/userStore';
 import { useResponsive } from '@/theme/hooks';
@@ -226,9 +225,6 @@ export default function Calendar() {
         accessToken as string,
       )
       .then(() => {
-        // if (res) {
-        //   setDataEvents(res);
-        // }
         forceRender();
       })
       .catch((err) => console.error(err));
@@ -290,13 +286,20 @@ export default function Calendar() {
     const calendarApi = fullCalendarRef.current!.getApi();
     const oldEvent = calendarApi.getEventById(id);
     oldEvent?.remove();
+
+    taskService
+      .deleteTask(id, accessToken as string)
+      .then(() => {
+        forceRender();
+      })
+      .catch((err) => console.error(err));
     /** logic set localStorage */
 
-    const dataLocal = localStorage.getItem(keyDataEvent);
-    const dataEvents = JSON.parse(dataLocal as string);
+    // const dataLocal = localStorage.getItem(keyDataEvent);
+    // const dataEvents = JSON.parse(dataLocal as string);
 
-    const newEvent = dataEvents?.filter((event: EventInput) => event.id !== id);
-    localStorage.setItem(keyDataEvent, JSON.stringify(newEvent));
+    // const newEvent = dataEvents?.filter((event: EventInput) => event.id !== id);
+    // localStorage.setItem(keyDataEvent, JSON.stringify(newEvent));
 
     /** logic set localStorage */
   };

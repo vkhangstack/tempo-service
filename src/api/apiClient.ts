@@ -38,9 +38,13 @@ axiosInstance.interceptors.response.use(
     if (!res.data) throw new Error(t('sys.api.apiRequestFailed'));
 
     const { error, data, message } = res.data;
-    const hasSuccess = data && Reflect.has(res.data, 'error') && error === ResultEnum.SUCCESS;
+    // const hasSuccess = data && Reflect.has(res?.data, 'error') && error === ResultEnum.SUCCESS;
+    const hasSuccess = error === ResultEnum.SUCCESS;
     if (hasSuccess) {
       return data;
+    }
+    if (error === ResultEnum.UNAUTHORIZED || error === ResultEnum.TOKEN_EMPTY) {
+      userStore.getState().actions.clearUserInfoAndToken();
     }
 
     throw new Error(message || t('sys.api.apiRequestFailed'));

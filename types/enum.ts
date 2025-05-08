@@ -6,6 +6,8 @@ export enum BasicStatus {
 export enum ResultEnum {
   SUCCESS = 0,
   ERROR = -1,
+  UNAUTHORIZED = -401,
+  TOKEN_EMPTY = -403,
   TIMEOUT = 401,
 }
 

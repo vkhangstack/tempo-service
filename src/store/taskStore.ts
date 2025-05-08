@@ -38,7 +38,6 @@ export const useGetTask = () => {
   const navigatge = useNavigate();
   App.useApp();
   const { accessToken } = useUserToken();
-  console.log('accessToken', accessToken);
 
   if (!accessToken) {
     navigatge('/login', { replace: true });
@@ -62,10 +61,8 @@ export const useGetTask = () => {
 
   // const getTasks = async () => {
   //   try {
-  //     console.log('first');
   //     const res =  ;
 
-  //     console.log('res', res);
   //   } catch (error) {
   //     message.warning({
   //       content: error.message,
