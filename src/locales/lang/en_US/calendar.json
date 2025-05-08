@@ -1,0 +1,23 @@
+{
+  "calendar": {
+    "event": {
+      "today": "Today",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year",
+      "day": "Day",
+      "hour": "Hour",
+      "minute": "Minute",
+      "second": "Second",
+      "am": "AM",
+      "pm": "PM",
+      "newTask": "New Task",
+      "newEvent": "New Event",
+      "newReminder": "New Reminder",
+      "newNote": "New Note",
+      "newTodo": "New Todo",
+      "newAppointment": "New Appointment",
+      "dailyTeams": "Daily Teams"
+    }
+  }
+}

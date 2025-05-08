@@ -1,6 +1,7 @@
 import { Button, Dropdown, MenuProps } from 'antd';
 import dayjs from 'dayjs';
 import { ReactNode, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { IconButton, Iconify } from '@/components/icon';
 import { useResponsive } from '@/theme/hooks';
@@ -20,10 +21,18 @@ type Props = {
   onMove: (action: HandleMoveArg) => void;
   onCreate: VoidFunction;
   onViewTypeChange: (view: ViewType) => void;
+  onDailyTeams: () => void;
 };
-export default function CalendarHeader({ now, view, onMove, onCreate, onViewTypeChange }: Props) {
+export default function CalendarHeader({
+  now,
+  view,
+  onMove,
+  onCreate,
+  onViewTypeChange,
+  onDailyTeams,
+}: Props) {
   const { screenMap } = useResponsive();
-
+  const { t } = useTranslation();
   const items = useMemo<ViewTypeMenu[]>(
     () => [
       {
@@ -91,13 +100,17 @@ export default function CalendarHeader({ now, view, onMove, onCreate, onViewType
       </div>
 
       <div className="flex items-center">
+        <Button className="mr-2" type="primary" onClick={() => onDailyTeams()}>
+          {t('calendar.event.dailyTeams')}
+        </Button>
+
         <Button type="primary" onClick={() => onMove('today')}>
-          Today
+          {t('calendar.event.today')}
         </Button>
         <Button className="ml-2" type="primary" onClick={() => onCreate()}>
           <div className=" flex items-center justify-center">
             <Iconify icon="material-symbols:add" size={24} />
-            New Event
+            {t('calendar.event.newEvent')}
           </div>
         </Button>
       </div>

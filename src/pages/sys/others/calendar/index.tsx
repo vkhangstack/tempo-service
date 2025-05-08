@@ -6,11 +6,13 @@ import interactionPlugin from '@fullcalendar/interaction'; //  click select drag
 import listPlugin from '@fullcalendar/list'; // listWeek view
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid'; // timeGridWeek, timeGridDay, timeGrid
+import { Modal } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 
 import taskService from '@/api/services/taskService';
 import Card from '@/components/card';
+import { useCopyToClipboard } from '@/hooks/event/use-copy-to-clipboard';
 import { useSettings } from '@/store/settingStore';
 import { useTaskActions, useTasks } from '@/store/taskStore';
 import { useUserToken } from '@/store/userStore';
@@ -36,9 +38,13 @@ export default function Calendar() {
   const [view, setView] = useState<ViewType>('dayGridMonth');
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
+  const [dailyTeams, setDailyTeams] = useState(false);
   const [eventInitValue, setEventInitValue] =
     useState<CalendarEventFormFieldType>(DefaultEventInitValue);
   const [eventFormType, setEventFormType] = useState<'add' | 'edit'>('add');
+  const [quillFull, setQuillFull] = useState('');
+  const [textCopy, setTextCopy] = useState('');
+  const { copyFn } = useCopyToClipboard();
 
   const { themeMode } = useSettings();
   const { screenMap } = useResponsive();
@@ -46,7 +52,6 @@ export default function Calendar() {
   const [, forceRender] = useReducer((x) => x + 1, 0);
   const { setTasks } = useTaskActions();
   const tasks = useTasks();
-
   useEffect(() => {
     if (screenMap.xs) {
       setView('listWeek');
@@ -80,11 +85,15 @@ export default function Calendar() {
             // backgroundColor: undefined,
           };
         });
-        setTasks(newData);
+        if (newData.length !== tasks.length) {
+          setTasks(newData);
+        }
       })
       .catch((err) => {
         console.error(err);
       });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken, setTasks]);
 
   /**
@@ -106,6 +115,71 @@ export default function Calendar() {
         break;
     }
     setDate(calendarApi.getDate());
+  };
+  const handleDailyTeams = () => {
+    // Lấy task hôm qua và hôm nay
+    const taskYesterday = tasks.find((item) => {
+      if (!item?.start) {
+        return '';
+      }
+      if (dayjs().day() === 1) {
+        // Nếu hôm nay là thứ 2 thì lấy thứ 6 tuần trước
+        // return dayjs(item?.start).isSame(dayjs().subtract(3, 'day'), 'day') && item.title === 'daily';
+        return (
+          dayjs(item?.start).isSame(dayjs().subtract(3, 'day'), 'day') && item.title === 'daily'
+        );
+      }
+
+      return dayjs(item?.start).isSame(dayjs().subtract(1, 'day'), 'day') && item.title === 'daily';
+    });
+
+    const taskToday = tasks.find((item) => {
+      return dayjs(item?.start).isSame(dayjs(), 'day') && item.title === 'daily';
+    });
+
+    const content = `<p><strong>Yesterday:</strong></p>${
+      taskYesterday
+        ? `${
+            taskYesterday?.description?.startsWith('<ul><li>')
+              ? taskYesterday?.description
+              : `<ul><li>${taskYesterday?.description}</li></ul>`
+          }`
+        : '<ul><li>No tasks found</li></ul>'
+    }<p><strong>Today:</strong></p>${
+      taskToday
+        ? `${
+            taskToday?.description?.startsWith('<ul><li>')
+              ? taskToday?.description
+              : `<ul><li>${taskToday?.description}</li></ul>`
+          }`
+        : '<ul><li>No tasks found</li></ul>'
+    }`;
+
+    const tmp = `𝗬𝗲𝘀𝘁𝗲𝗿𝗱𝗮𝘆:
+    ${taskYesterday?.description
+      ?.split(/<li>(.*?)<\/li>/g)
+      .filter((item) => item !== '' && item !== '<ul>' && item !== '</ul>')
+      .map((item) => `- ${item}`)
+      .join(
+        `
+    `,
+      )
+      .replaceAll('- </ul>', '')
+      .replaceAll('- <ul>', '')}}
+𝗧𝗼𝗱𝗮𝘆:
+    ${taskToday?.description
+      ?.split(/<li>(.*?)<\/li>/g)
+      .filter((item) => item !== '' && item !== '<ul>' && item !== '</ul>')
+      .map((item) => `- ${item}`)
+      .join(
+        `
+    `,
+      )
+      .replaceAll('- </ul>', '')
+      .replaceAll('- <ul>', '')}`;
+    setQuillFull(content);
+    setTextCopy(tmp);
+    setDailyTeams(true);
   };
   const handleViewTypeChange = (view: ViewType) => {
     setView(view);
@@ -280,6 +354,7 @@ export default function Calendar() {
             onMove={handleMove}
             onCreate={() => setOpen(true)}
             onViewTypeChange={handleViewTypeChange}
+            onDailyTeams={handleDailyTeams}
           />
           <FullCalendar
             ref={fullCalendarRef}
@@ -307,6 +382,19 @@ export default function Calendar() {
         onCreate={handleCreate}
         onEdit={handleEdit}
       />
+      <Modal
+        open={dailyTeams}
+        title="Preview Daily Teams"
+        width={screenMap.xs ? '100%' : '50%'}
+        onCancel={() => setDailyTeams(false)}
+        onOk={() => copyFn(textCopy)}
+        okText="Copy"
+      >
+        {/* <Editor id="full-editor" value={quillFull} onChange={setQuillFull} readOnly theme="snow" /> */}
+        <div className="mt-2 flex items-center justify-between rounded-xl border-gray-300 bg-gray-200 p-4">
+          <div dangerouslySetInnerHTML={{ __html: quillFull }} />
+        </div>
+      </Modal>
     </Card>
   );
 }
