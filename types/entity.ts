@@ -58,8 +58,9 @@ export interface Task {
   title: string;
   description?: string;
   allDay: boolean;
-  start: string;
-  end: string;
-  textColor: string;
-  backgroundColor: string;
+  start: string | Date;
+  end: string | Date;
+  textColor?: string;
+  backgroundColor?: string;
+  color?: string;
 }

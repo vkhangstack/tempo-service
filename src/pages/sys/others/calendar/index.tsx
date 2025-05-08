@@ -12,6 +12,7 @@ import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react'
 import taskService from '@/api/services/taskService';
 import Card from '@/components/card';
 import { useSettings } from '@/store/settingStore';
+import { useTaskActions, useTasks } from '@/store/taskStore';
 import { useUserToken } from '@/store/userStore';
 import { useResponsive } from '@/theme/hooks';
 
@@ -37,12 +38,13 @@ export default function Calendar() {
   const [eventInitValue, setEventInitValue] =
     useState<CalendarEventFormFieldType>(DefaultEventInitValue);
   const [eventFormType, setEventFormType] = useState<'add' | 'edit'>('add');
-  const [dataEvents, setDataEvents] = useState<any[]>([]);
 
   const { themeMode } = useSettings();
   const { screenMap } = useResponsive();
   const { accessToken } = useUserToken();
   const [, forceRender] = useReducer((x) => x + 1, 0);
+  const { setTasks } = useTaskActions();
+  const tasks = useTasks();
 
   useEffect(() => {
     if (screenMap.xs) {
@@ -61,7 +63,7 @@ export default function Calendar() {
         if (!res || res.length === 0) {
           return;
         }
-        const newData = res?.map((item: any) => {
+        const newData: any[] = res?.map((item: any) => {
           return {
             // ...item,
             id: String(item.id),
@@ -78,12 +80,12 @@ export default function Calendar() {
           };
         });
 
-        setDataEvents(newData);
+        setTasks(newData);
       })
       .catch((err) => {
         console.error(err);
       });
-  }, [accessToken]);
+  }, [accessToken, setTasks]);
 
   // useMemo(() => {
   //   const dataLocal = localStorage.getItem(keyDataEvent);
@@ -265,7 +267,7 @@ export default function Calendar() {
           return;
         }
 
-        dataEvents.push({
+        tasks.push({
           id: res.id,
           title: res.title,
           allDay: res.allDay,
@@ -277,7 +279,7 @@ export default function Calendar() {
 
         newEvent.id = String(res.id);
         calendarApi.addEvent(newEvent);
-        setDataEvents(dataEvents);
+        setTasks(tasks);
       })
       .catch((err) => console.error(err));
   };
@@ -320,7 +322,7 @@ export default function Calendar() {
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
             initialDate={date}
             initialView={screenMap.xs ? 'listWeek' : view}
-            events={dataEvents}
+            events={tasks as any[]}
             eventContent={CalendarEvent}
             editable
             selectable
