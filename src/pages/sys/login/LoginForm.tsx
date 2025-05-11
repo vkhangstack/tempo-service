@@ -6,6 +6,7 @@ import { AiFillGithub, AiFillGoogleCircle, AiFillWechat } from 'react-icons/ai';
 import { SignInReq } from '@/api/services/userService';
 import { useSignIn } from '@/store/userStore';
 
+import { LoginButtonTeams } from './components/LoginButtonTeams';
 import { LoginStateEnum, useLoginStateContext } from './providers/LoginStateProvider';
 
 function LoginForm() {
@@ -152,9 +153,9 @@ function LoginForm() {
               {t('sys.login.qrSignInFormTitle')}
             </Button>
           </Col> */}
-          {/* <Col span={18} flex="1">
+          <Col span={18} flex="1">
             <LoginButtonTeams />
-          </Col> */}
+          </Col>
           <Col span={24} flex="1" onClick={() => setLoginState(LoginStateEnum.REGISTER)}>
             <Button className="w-full !text-sm">{t('sys.login.signUpFormTitle')}</Button>
           </Col>

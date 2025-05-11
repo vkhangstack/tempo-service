@@ -19,6 +19,12 @@ import './locales/i18n';
 // tailwind css
 import './theme/index.css';
 
+import { PublicClientApplication } from '@azure/msal-browser';
+
+import { msalConfig } from './utils/msteams';
+
+import { MsalProvider } from '@azure/msal-react';
+
 const charAt = `
     Tempo Service
   `;
@@ -37,7 +43,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// const msalInstance = new PublicClientApplication(msalConfig);
+const msalInstance = new PublicClientApplication(msalConfig);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -47,9 +53,9 @@ root.render(
       <ReactQueryDevtools initialIsOpen={false} />
       <Suspense>
         <Analytics />
-        {/* <MsalProvider instance={msalInstance}> */}
-        <App />
-        {/* </MsalProvider> */},
+        <MsalProvider instance={msalInstance}>
+          <App />
+        </MsalProvider>
       </Suspense>
     </QueryClientProvider>
   </HelmetProvider>,
